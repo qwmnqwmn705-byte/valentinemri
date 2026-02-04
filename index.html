@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Be My Valentine 💖</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Comic Sans MS", "Poppins", sans-serif;
+    background: linear-gradient(135deg, #ffd1dc, #ffe6f0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #d63384;
+  }
+
+  .container {
+    background: #fff0f6;
+    padding: 40px 30px 30px;
+    border-radius: 22px;
+    width: 360px;
+    text-align: center;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+    position: relative;
+  }
+
+  .score-badge {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff4d6d;
+    color: white;
+    padding: 8px 22px;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 6px 18px rgba(255,77,109,0.45);
+  }
+
+  h1 {
+    margin-top: 10px;
+  }
+
+  .question {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .options button,
+  .final button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .options button {
+    background: #ffb3c6;
+    color: #6a004f;
+  }
+
+  .options button:hover {
+    background: #ff8fab;
+    transform: scale(1.03);
+  }
+
+  .final {
+    margin-top: 10px;
+  }
+
+  .yes {
+    background: #ff4d6d;
+    color: white;
+  }
+
+  .yes:hover {
+    transform: scale(1.05);
+  }
+
+  .no {
+    background: #adb5bd;
+    color: white;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+
+  .popup {
+    text-align: center;
+    animation: pop 0.5s ease forwards;
+    pointer-events: none;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  .heart {
+    font-size: 70px;
+  }
+
+  .wrong {
+    font-size: 36px;
+    color: #ffd166;
+    font-weight: bold;
+    text-shadow: 0 0 12px rgba(255,209,102,0.7);
+  }
+
+  .error-modal {
+    background: rgba(0,0,0,0.88);
+    color: #ff4d6d;
+    padding: 22px;
+    border-radius: 16px;
+    font-family: monospace;
+    width: 320px;
+    position: relative;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    cursor: pointer;
+    font-size: 18px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="score-badge">
+    💖 Score: <span id="score">0</span>
+  </div>
+
+  <h1>Hey You 💕</h1>
+  <div id="content"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<script>
+let score = 0;
+let current = 0;
+
+const questions = [
+  {
+    q: "When did I first fall for you?",
+    options: ["2 Nov 2022", "4 April 2022", "1 April 2022", "15 June 2022"],
+    answer: 1
+  },
+  {
+    q: "Where did we go on our first real date?",
+    options: ["McDonald's", "Pickle", "Xero Degrees", "Hungry Jack's"],
+    answer: 2
+  },
+  {
+    q: "What was the first gift I brought you on that date?",
+    options: ["Bracelet", "Cake", "Necklace", "Flower"],
+    answer: 0
+  },
+  {
+    q: "Where did we take our first kiss picture?",
+    options: ["CP", "Mestro", "Home", "Cab"],
+    answer: 3
+  }
+];
+
+const content = document.getElementById("content");
+const scoreEl = document.getElementById("score");
+const overlay = document.getElementById("overlay");
+
+function showPopup(html, duration = 900) {
+  overlay.innerHTML = `<div class="popup">${html}</div>`;
+  overlay.style.display = "flex";
+  setTimeout(() => {
+    overlay.style.display = "none";
+    overlay.innerHTML = "";
+  }, duration);
+}
+
+function showQuestion() {
+  const q = questions[current];
+  content.innerHTML = `
+    <div class="question">${q.q}</div>
+    <div class="options">
+      ${q.options.map((opt, i) =>
+        `<button onclick="answer(${i})">${opt}</button>`
+      ).join("")}
+    </div>
+  `;
+}
+
+function answer(i) {
+  if (i === questions[current].answer) {
+    score++;
+    scoreEl.textContent = score;
+    showPopup(`<div class="heart">❤️</div>`);
+  } else {
+    showPopup(`<div class="wrong">IMMA KILL UUU 😡💔</div>`);
+  }
+
+  current++;
+  setTimeout(() => {
+    if (current < questions.length) showQuestion();
+    else showFinal();
+  }, 900);
+}
+
+function showFinal() {
+  content.innerHTML = `
+    <div class="question">Final Question 💘</div>
+    <h2>Will you be my Valentine?</h2>
+    <div class="final">
+      <button class="yes" onclick="yes()">YES 💖</button>
+      <button class="no" onclick="no()">NO 💻</button>
+    </div>
+  `;
+}
+
+function yes() {
+  const msg = score < 3 ? "<p><b>We need to talk abt this 😐</b></p>" : "";
+  content.innerHTML = `
+    <h1>YAYYYYY 💕🎉</h1>
+    <p>You just made me the happiest person alive ❤️</p>
+    <p>Final Score: ${score}/4 💘</p>
+    ${msg}
+  `;
+}
+
+function no() {
+  overlay.innerHTML = `
+    <div class="error-modal">
+      <div class="close-btn" onclick="closeError()">✖</div>
+      ❌ SYSTEM ERROR<br><br>
+      Cannot execute: rejectValentine()<br>
+      Reason: You are already my girlfriend ❤️<br>
+      Status: PERMANENT<br>
+      <i>Try pressing YES instead.</i>
+    </div>
+  `;
+  overlay.style.display = "flex";
+}
+
+function closeError() {
+  overlay.style.display = "none";
+  overlay.innerHTML = "";
+}
+
+showQuestion();
+</script>
+
+</body>
+</html>
